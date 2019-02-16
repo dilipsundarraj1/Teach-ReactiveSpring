@@ -24,6 +24,6 @@ brew services restart mongodb
 
 - Follow the steps in the below link to install Mongo db in Windows.
 
-!(https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/)
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 
 
