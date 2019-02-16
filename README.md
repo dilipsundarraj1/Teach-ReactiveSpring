@@ -14,7 +14,7 @@
 brew install mongodb
 ```
 
---  How to restart MongoDB in your local machine.
+-  How to restart MongoDB in your local machine.
 
 ```
 brew services restart mongodb
