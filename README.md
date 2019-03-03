@@ -1,6 +1,6 @@
 # Teach-ReactiveSpring
 
-- This code base has the code to learn the reactive spring .
+- This repository has the code to learn the reactive spring .
 
 ### Run the application in your local
 
