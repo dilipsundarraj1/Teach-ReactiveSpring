@@ -62,7 +62,7 @@ public class ItemControllerTest {
         webTestClient.get().uri(ItemConstants.ITEM_END_POINT_V1)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(Item.class)
                 .hasSize(4);
 
@@ -73,7 +73,7 @@ public class ItemControllerTest {
         webTestClient.get().uri(ItemConstants.ITEM_END_POINT_V1)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(Item.class)
                 .hasSize(4)
         .consumeWith((response) -> {
@@ -92,7 +92,7 @@ public class ItemControllerTest {
         Flux<Item> itemsFlux = webTestClient.get().uri(ItemConstants.ITEM_END_POINT_V1)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .returnResult(Item.class)
                 .getResponseBody();
 
@@ -127,7 +127,7 @@ public class ItemControllerTest {
         Item item = new Item(null, "Iphone X", 999.99);
 
         webTestClient.post().uri(ItemConstants.ITEM_END_POINT_V1)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(item), Item.class)
                 .exchange()
                 .expectStatus().isCreated()
@@ -144,7 +144,7 @@ public class ItemControllerTest {
     public void deleteItem(){
 
         webTestClient.delete().uri(ItemConstants.ITEM_END_POINT_V1.concat("/{id}"),"ABC")
-                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Void.class);
@@ -157,8 +157,8 @@ public class ItemControllerTest {
         Item item = new Item(null,"Beats HeadPhones", newPrice);
 
         webTestClient.put().uri(ItemConstants.ITEM_END_POINT_V1.concat("/{id}"),"ABC")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(item), Item.class)
                 .exchange()
                 .expectStatus().isOk()
@@ -173,8 +173,8 @@ public class ItemControllerTest {
         Item item = new Item(null,"Beats HeadPhones", newPrice);
 
         webTestClient.put().uri(ItemConstants.ITEM_END_POINT_V1.concat("/{id}"),"DEF")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(item), Item.class)
                 .exchange()
                 .expectStatus().isNotFound();
