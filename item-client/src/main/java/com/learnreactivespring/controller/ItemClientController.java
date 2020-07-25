@@ -4,10 +4,16 @@ import com.learnreactivespring.domain.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.adapter.DefaultServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
 
 @RestController
 @Slf4j
@@ -66,15 +72,6 @@ public class ItemClientController {
 
     }
 
-    @DeleteMapping("/client/deleteItem/{id}")
-    public Mono<Void> deleteItem(@PathVariable String id){
-
-        return webClient.delete().uri("/v1/items/{id}",id)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .log("Deleted Item is");
-    }
-
     @GetMapping("/client/retrieve/error")
     public Flux<Item> errorRetrieve(){
 
@@ -86,10 +83,19 @@ public class ItemClientController {
                     Mono<String> errorMono = clientResponse.bodyToMono(String.class);
                     return errorMono.flatMap((errorMessage) -> {
                         log.error("The error Message is : " + errorMessage);
-                        throw  new RuntimeException(errorMessage);
+                        return Mono.error(new RuntimeException(errorMessage));
                     });
                 })
-               .bodyToFlux(Item.class);
+                .bodyToFlux(Item.class);
+    }
+
+    @DeleteMapping("/client/deleteItem/{id}")
+    public Mono<Void> deleteItem(@PathVariable String id){
+
+        return webClient.delete().uri("/v1/items/{id}",id)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .log("Deleted Item is");
     }
 
 
@@ -106,7 +112,7 @@ public class ItemClientController {
                         return clientResponse.bodyToMono(String.class)
                                 .flatMap(errorMessage -> {
                                     log.error("Error Message in errorExchange : " + errorMessage);
-                                    throw  new RuntimeException(errorMessage);
+                                    return Mono.error(new RuntimeException(errorMessage));
                                 });
                     }else{
                         return clientResponse.bodyToFlux(Item.class);
@@ -129,6 +135,15 @@ public class ItemClientController {
                 .bodyToMono(Item.class)
                 .log("Updated Item is : ");
     }
+
+/*
+    @ExceptionHandler
+    public Mono<ServerResponse> handle(RuntimeException ex) {
+        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .bodyValue(ex.getMessage());
+
+    }
+*/
 
 
 

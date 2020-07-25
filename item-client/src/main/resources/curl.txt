@@ -1,4 +1,4 @@
-GET ALL ITEMS
+`GET ALL ITEMS
 --------------
 curl http://localhost:8081/client/retrieve
 curl http://localhost:8081/client/exchange
