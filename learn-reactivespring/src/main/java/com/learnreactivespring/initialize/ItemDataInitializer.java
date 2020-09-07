@@ -10,6 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -29,7 +30,7 @@ public class ItemDataInitializer implements CommandLineRunner {
     ItemReactiveCappedRepository itemReactiveCappedRepository;
 
     @Autowired
-    MongoOperations mongoOperations;
+    ReactiveMongoOperations mongoOperations;
 
     @Override
     public void run(String... args) throws Exception {

@@ -53,6 +53,26 @@ public class FluxAndMonoTransformTest {
 
     }
 
+
+    @Test
+    public void transformUsingMap_Length_repeat_using_retryWhen() {
+
+
+        Flux<Integer> namesFlux = Flux.fromIterable(names)
+                .map(s -> s.length()) //ADAM, ANNA, JACK, JENNY
+                .repeatWhen(repeat -> {
+                    return repeat.all(size -> size>4) //repeats once
+                            .repeat(1); //repeats once
+                })
+                //.repeat(1)
+                .log();
+
+        StepVerifier.create(namesFlux)
+                .expectNext(4, 4, 4, 5, 4, 4, 4, 5,4, 4, 4, 5)
+                .verifyComplete();
+
+    }
+
     @Test
     public void transformUsingMap_Filter() {
 

@@ -1,4 +1,4 @@
-name: Java CI
+name: learn-reactive-spring
 
 on: [push]
 
@@ -13,5 +13,8 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build with Gradle
-      run: /learn-reactivespring./gradlew build
+    - name: Build Reactive Spring Project
+      run: |
+        cd learn-reactivespring
+        chmod +x gradlew 
+        ./gradlew build

@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -32,7 +33,7 @@ public class ItemStreamsHandlerTest {
     ItemReactiveCappedRepository itemReactiveCappedRepository;
 
     @Autowired
-    MongoOperations mongoOperations;
+    ReactiveMongoOperations mongoOperations;
 
     @Autowired
     WebTestClient webTestClient;
@@ -41,7 +42,8 @@ public class ItemStreamsHandlerTest {
     public void setUp() {
 
         mongoOperations.dropCollection(ItemCapped.class);
-        mongoOperations.createCollection(ItemCapped.class, CollectionOptions.empty().maxDocuments(20).size(50000).capped());
+        mongoOperations.createCollection(ItemCapped.class, CollectionOptions.empty().maxDocuments(20).size(50000).capped())
+                .block();
 
         Flux<ItemCapped> itemCappedFlux = Flux.interval(Duration.ofMillis(100))
                 .map(i -> new ItemCapped(null, "Random Item " + i, (100.00 + i)))
@@ -58,7 +60,7 @@ public class ItemStreamsHandlerTest {
     }
 
     @Test
-    public void testStreamAllItems(){
+    public void testStreamAllItems() {
 
         Flux<ItemCapped> itemCappedFlux = webTestClient.get().uri(ItemConstants.ITEM_STREAM_FUNCTIONAL_END_POINT_V1)
                 .exchange()
