@@ -16,7 +16,7 @@ public class ItemClientController {
     WebClient webClient = WebClient.create("http://localhost:8080");
 
     @GetMapping("/client/retrieve")
-    public Flux<Item> getAllItemsUsingRetrieve(){
+    public Flux<Item> getAllItemsUsingRetrieve() {
 
         return webClient.get().uri("/v1/items")
                 .retrieve()
@@ -25,7 +25,7 @@ public class ItemClientController {
     }
 
     @GetMapping("/client/exchange")
-    public Flux<Item> getAllItemsUsingExchange(){
+    public Flux<Item> getAllItemsUsingExchange() {
 
         return webClient.get().uri("/v1/items")
                 .exchange()
@@ -34,30 +34,30 @@ public class ItemClientController {
     }
 
     @GetMapping("/client/retrieve/singleItem")
-    public Mono<Item> getOneItemUsingRetrieve(@PathVariable String id){
+    public Mono<Item> getOneItemUsingRetrieve(@PathVariable String id) {
 
-        return webClient.get().uri("/v1/items/{id}",id)
+        return webClient.get().uri("/v1/items/{id}", id)
                 .retrieve()
                 .bodyToMono(Item.class)
                 .log("Items in Client Project retrieve single Item : ");
     }
 
     @GetMapping("/client/exchange/singleItem")
-    public Mono<Item> getOneItemUsingExchange(){
+    public Mono<Item> getOneItemUsingExchange() {
 
         String id = "ABC";
 
-        return webClient.get().uri("/v1/items/{id}",id)
+        return webClient.get().uri("/v1/items/{id}", id)
                 .exchange()
                 .flatMap(clientResponse -> clientResponse.bodyToMono(Item.class))
                 .log("Items in Client Project retrieve single Item : ");
     }
 
     @PostMapping("/client/createItem")
-    public Mono<Item> createItem(@RequestBody Item item){
+    public Mono<Item> createItem(@RequestBody Item item) {
 
         Mono<Item> itemMono = Mono.just(item);
-       return webClient.post().uri("/v1/items")
+        return webClient.post().uri("/v1/items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(itemMono, Item.class)
                 .retrieve()
@@ -67,16 +67,16 @@ public class ItemClientController {
     }
 
     @DeleteMapping("/client/deleteItem/{id}")
-    public Mono<Void> deleteItem(@PathVariable String id){
+    public Mono<Void> deleteItem(@PathVariable String id) {
 
-        return webClient.delete().uri("/v1/items/{id}",id)
+        return webClient.delete().uri("/v1/items/{id}", id)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .log("Deleted Item is");
     }
 
     @GetMapping("/client/retrieve/error")
-    public Flux<Item> errorRetrieve(){
+    public Flux<Item> errorRetrieve() {
 
         return webClient.get()
                 .uri("/v1/items/runtimeException")
@@ -86,50 +86,40 @@ public class ItemClientController {
                     Mono<String> errorMono = clientResponse.bodyToMono(String.class);
                     return errorMono.flatMap((errorMessage) -> {
                         log.error("The error Message is : " + errorMessage);
-                        throw  new RuntimeException(errorMessage);
+                        throw new RuntimeException(errorMessage);
                     });
                 })
-               .bodyToFlux(Item.class);
+                .bodyToFlux(Item.class);
     }
 
 
     @GetMapping("/client/exchange/error")
-    public Flux<Item> errorExchange(){
-
+    public Flux<Item> errorExchange() {
         return webClient.get()
                 .uri("/v1/items/runtimeException")
-                .exchange()
-                .flatMapMany((clientResponse -> {
-
-                    if(clientResponse.statusCode().is5xxServerError()){
-
-                        return clientResponse.bodyToMono(String.class)
-                                .flatMap(errorMessage -> {
-                                    log.error("Error Message in errorExchange : " + errorMessage);
-                                    throw  new RuntimeException(errorMessage);
-                                });
-                    }else{
-                        return clientResponse.bodyToFlux(Item.class);
+                .exchangeToFlux(clientResponse -> {
+                    if (clientResponse.statusCode().is5xxServerError()) {
+                        return clientResponse.bodyToFlux(String.class)
+                                .flatMap(errorMessage -> Flux.error(new RuntimeException(errorMessage)));
                     }
-
-                }));
+                    return clientResponse.bodyToFlux(Item.class);
+                });
 
     }
 
 
     @PutMapping("/client/updateItem/{id}")
     public Mono<Item> updateItem(@PathVariable String id,
-                                 @RequestBody Item item){
+                                 @RequestBody Item item) {
 
         Mono<Item> itemBody = Mono.just(item);
 
-        return webClient.put().uri("/v1/items/{id}",id)
+        return webClient.put().uri("/v1/items/{id}", id)
                 .body(itemBody, Item.class)
                 .retrieve()
                 .bodyToMono(Item.class)
                 .log("Updated Item is : ");
     }
-
 
 
 }
