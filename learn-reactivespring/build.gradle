@@ -30,6 +30,6 @@ dependencies {
 
 test {
 	useJUnit()
-	exclude 'com/learnreactivespring/fluxandmonoplayground/**'
+	//exclude 'com/learnreactivespring/fluxandmonoplayground/**'
 
 }

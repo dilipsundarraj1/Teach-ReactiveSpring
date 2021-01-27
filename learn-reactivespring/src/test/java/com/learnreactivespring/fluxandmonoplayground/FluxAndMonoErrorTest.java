@@ -1,8 +1,10 @@
 package com.learnreactivespring.fluxandmonoplayground;
 
 import org.junit.Test;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
 
@@ -83,18 +85,22 @@ public class FluxAndMonoErrorTest {
     @Test
     public void fluxErrorHandling_OnErrorMap_withRetryBackoff() {
 
+        Retry retrySpec = Retry.fixedDelay(2, Duration.ofMillis(1000))
+                .filter((ex) -> ex instanceof CustomException)
+                .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) -> Exceptions.propagate(retrySignal.failure())));
+
         Flux<String> stringFlux = Flux.just("A", "B", "C")
                 .concatWith(Flux.error(new RuntimeException("Exception Occurred")))
                 .concatWith(Flux.just("D"))
                 .onErrorMap((e) -> new CustomException(e))
-                .retryBackoff(2, Duration.ofSeconds(5));
+                .retryWhen(retrySpec);
 
         StepVerifier.create(stringFlux.log())
                 .expectSubscription()
                 .expectNext("A", "B", "C")
                 .expectNext("A", "B", "C")
                 .expectNext("A", "B", "C")
-                .expectError(IllegalStateException.class)
+                .expectError(CustomException.class)
                 .verify();
 
     }
